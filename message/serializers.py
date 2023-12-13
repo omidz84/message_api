@@ -43,7 +43,6 @@ class MessageSerializer(serializers.ModelSerializer):
         return message
 
 
-
 class SendGroupMessageSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -157,11 +156,15 @@ class ReplyMessageSerializer(serializers.ModelSerializer):
         assign_perm('message.add_replymessage', user)
         assign_perm('message.change_replymessage', user)
         assign_perm('message.delete_replymessage', user)
+
+        assign_perm('message.view_replymessage', reply.message_id.creator)
         # object permission
         assign_perm('view_replymessage', user, reply)
         assign_perm('add_replymessage', user, reply)
         assign_perm('change_replymessage', user, reply)
         assign_perm('delete_replymessage', user, reply)
+
+        assign_perm('view_replymessage', reply.message_id.creator, reply)
 
         return reply
 
@@ -195,9 +198,9 @@ class DetailMessageSerializer(serializers.ModelSerializer):
 
 
 class UnreadMessagesSerializer(serializers.Serializer):
-    unread_count = serializers.SerializerMethodField()
+    unread_message = serializers.SerializerMethodField()
 
-    def get_unread_count(self, obj):
+    def get_unread_message(self, obj):
         user = self.context['request'].user
         user_message = models.SentUserMessage.objects.filter(
             user_id=user
@@ -207,7 +210,7 @@ class UnreadMessagesSerializer(serializers.Serializer):
             group_id__in=user.groups.all()
         ).values_list('message_id_id', flat=True)
 
-        message = user_message.union(group_message)
-        seen_message = models.SeenMessage.objects.filter(message_id__in=message).count()
-        unread_count = message.count() - seen_message
-        return unread_count
+        message = user_message.union(group_message).count()
+        seen_message = models.SeenMessage.objects.filter(user_id=user).count()
+        unread_message = message - seen_message
+        return unread_message

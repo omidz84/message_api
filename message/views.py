@@ -42,7 +42,7 @@ class ReplyMessageView(generics.CreateAPIView):
     serializer_class = serializers.ReplyMessageSerializer
 
 
-class DetailReplyMessageView(generics.RetrieveUpdateAPIView):
+class DetailReplyMessageView(generics.RetrieveAPIView):
     permission_classes = [CustomObjectPermissions]
     queryset = models.ReplyMessage.objects.all()
     serializer_class = serializers.DetailReplyMessageSerializer
@@ -74,12 +74,19 @@ class ReceivedMessagesView(generics.ListAPIView):
 
 
 class DetailMessageView(generics.RetrieveAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+    queryset = models.Message.objects.all()
+    serializer_class = serializers.DetailMessageSerializer
+
+
+class UpdateMessageView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [CustomObjectPermissions]
     queryset = models.Message.objects.all()
     serializer_class = serializers.DetailMessageSerializer
 
 
 class UnreadMessagesCountView(generics.GenericAPIView):
+    permission_classes = [permissions.IsAuthenticated]
     serializer_class = serializers.UnreadMessagesSerializer
 
     def get(self, request, *args, **kwargs):
