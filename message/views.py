@@ -48,12 +48,6 @@ class DetailReplyMessageView(generics.RetrieveAPIView):
     serializer_class = serializers.DetailReplyMessageSerializer
 
 
-class DeleteTotalMessageView(generics.DestroyAPIView):
-    permission_classes = [CustomObjectPermissions]
-    queryset = models.Message.objects.all()
-    serializer_class = serializers.MessageSerializer
-
-
 class ReceivedMessagesView(generics.ListAPIView):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = serializers.MessageSerializer
