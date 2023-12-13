@@ -36,18 +36,6 @@ class SentMessagesView(generics.ListAPIView):
         return models.Message.objects.filter(creator=user)
 
 
-class ReplyMessageView(generics.CreateAPIView):
-    permission_classes = [permissions.IsAuthenticated]
-    queryset = models.ReplyMessage.objects.all()
-    serializer_class = serializers.ReplyMessageSerializer
-
-
-class DetailReplyMessageView(generics.RetrieveAPIView):
-    permission_classes = [CustomObjectPermissions]
-    queryset = models.ReplyMessage.objects.all()
-    serializer_class = serializers.DetailReplyMessageSerializer
-
-
 class ReceivedMessagesView(generics.ListAPIView):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = serializers.MessageSerializer
@@ -87,3 +75,17 @@ class UnreadMessagesCountView(generics.GenericAPIView):
         serializer = self.serializer_class(request.data, context={'request': request})
         return Response(serializer.data)
 
+
+class ReplyMessageView(generics.CreateAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+    queryset = models.Message.objects.all()
+    serializer_class = serializers.ReplyMessageSerializer
+
+
+class ShowReplyMessageView(generics.ListAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = serializers.MessageSerializer
+
+    def get_queryset(self):
+        parent_id = self.kwargs['parent']
+        return models.Message.objects.filter(parent__id=parent_id)

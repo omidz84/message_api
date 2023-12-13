@@ -19,6 +19,7 @@ class MessageSerializer(serializers.ModelSerializer):
         fields = '__all__'
         extra_kwargs = {
             'creator': {'read_only': True},
+            'parent': {'read_only': True}
         }
 
     def create(self, validated_data):
@@ -130,57 +131,6 @@ class SentMessagesSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class ReplyMessageSerializer(serializers.ModelSerializer):
-    sender = UserSerializer(read_only=True)
-
-    class Meta:
-        model = models.ReplyMessage
-        fields = '__all__'
-        extra_kwargs = {
-            'sender': {'read_only': True},
-        }
-
-    def create(self, validated_data):
-        request = self.context.get('request')
-        reply = models.ReplyMessage.objects.create(
-            message_id=validated_data['message_id'],
-            title=validated_data['title'],
-            message_body=validated_data['message_body'],
-            sender=request.user,
-        )
-
-        user = reply.sender
-
-        # model permissions
-        assign_perm('message.view_replymessage', user)
-        assign_perm('message.add_replymessage', user)
-        assign_perm('message.change_replymessage', user)
-        assign_perm('message.delete_replymessage', user)
-
-        assign_perm('message.view_replymessage', reply.message_id.creator)
-        # object permission
-        assign_perm('view_replymessage', user, reply)
-        assign_perm('add_replymessage', user, reply)
-        assign_perm('change_replymessage', user, reply)
-        assign_perm('delete_replymessage', user, reply)
-
-        assign_perm('view_replymessage', reply.message_id.creator, reply)
-
-        return reply
-
-
-class DetailReplyMessageSerializer(serializers.ModelSerializer):
-    sender = UserSerializer(read_only=True)
-    message_id = MessageSerializer(read_only=True)
-
-    class Meta:
-        model = models.ReplyMessage
-        fields = '__all__'
-        extra_kwargs = {
-            'sender': {'read_only': True},
-        }
-
-
 class DetailMessageSerializer(serializers.ModelSerializer):
     creator = UserSerializer(read_only=True)
     seen_status = serializers.SerializerMethodField()
@@ -214,3 +164,35 @@ class UnreadMessagesSerializer(serializers.Serializer):
         seen_message = models.SeenMessage.objects.filter(user_id=user).count()
         unread_message = message - seen_message
         return unread_message
+
+
+class ReplyMessageSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = models.Message
+        fields = '__all__'
+        extra_kwargs = {
+            'creator': {'read_only': True}
+        }
+
+    def create(self, validated_data):
+        request = self.context.get('request')
+        message = models.Message.objects.create(
+            title=validated_data['title'],
+            message_body=validated_data['message_body'],
+            creator=request.user,
+            send_type=validated_data['send_type'],
+            parent=validated_data['parent']
+        )
+        user = message.creator
+        # model permissions
+        assign_perm('message.view_message', user)
+        assign_perm('message.add_message', user)
+        assign_perm('message.change_message', user)
+        assign_perm('message.delete_message', user)
+        # object permission
+        assign_perm('view_message', user, message)
+        assign_perm('add_message', user, message)
+        assign_perm('change_message', user, message)
+        assign_perm('delete_message', user, message)
+        return message

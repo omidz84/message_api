@@ -16,6 +16,7 @@ class Message(models.Model):
     creator = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='creator')
     send_type = models.CharField(max_length=15, choices=type)
     is_draft = models.BooleanField(verbose_name='is draft', default=True)
+    parent = models.ForeignKey('self', on_delete=models.CASCADE, verbose_name='parent', null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -76,20 +77,3 @@ class SeenMessage(models.Model):
     class Meta:
         verbose_name = 'seen message'
         verbose_name_plural = 'seen messages'
-
-
-class ReplyMessage(models.Model):
-    message_id = models.ForeignKey(Message, on_delete=models.CASCADE, verbose_name='message')
-    title = models.CharField(max_length=300, db_index=True, verbose_name='title')
-    message_body = models.TextField(verbose_name='message body')
-    sender = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='sender')
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return f'{self.message_id.__str__()} | {self.sender.username}'
-
-    class Meta:
-        verbose_name = 'reply message'
-        verbose_name_plural = 'reply messages'
-
