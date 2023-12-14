@@ -10,7 +10,6 @@ urlpatterns = [
     path('sent/list/', views.SentMessagesView.as_view(), name='sent-message'),
     path('received/list/', views.ReceivedMessagesView.as_view(), name='received-message'),
     path('detail/<int:pk>/', views.DetailMessageView.as_view(), name='detail-message'),
-    path('update/<int:pk>/', views.UpdateMessageView.as_view(), name='update-message'),
     path('unread/count/', views.UnreadMessagesCountView.as_view()),
     path('reply/', views.ReplyMessageView.as_view(), name='reply-message'),
     path('reply/<int:parent>/', views.ShowReplyMessageView.as_view(), name='show-reply-message'),

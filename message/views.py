@@ -55,13 +55,7 @@ class ReceivedMessagesView(generics.ListAPIView):
         return models.Message.objects.filter(id__in=message)
 
 
-class DetailMessageView(generics.RetrieveAPIView):
-    permission_classes = [CustomObjectPermissions]
-    queryset = models.Message.objects.all()
-    serializer_class = serializers.DetailMessageSerializer
-
-
-class UpdateMessageView(generics.RetrieveUpdateDestroyAPIView):
+class DetailMessageView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [CustomObjectPermissions]
     queryset = models.Message.objects.all()
     serializer_class = serializers.DetailMessageSerializer

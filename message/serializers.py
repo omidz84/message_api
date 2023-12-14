@@ -72,13 +72,13 @@ class SendGroupMessageSerializer(serializers.ModelSerializer):
         assign_perm('message.change_sentgroupmessage', user)
         assign_perm('message.delete_sentgroupmessage', user)
 
-        assign_perm('message.view_sentgroupmessage', send_message.group_id)
+        assign_perm('message.view_message', send_message.group_id)
         # object permission
         assign_perm('view_sentgroupmessage', user, send_message)
         assign_perm('change_sentgroupmessage', user, send_message)
         assign_perm('delete_sentgroupmessage', user, send_message)
 
-        assign_perm('view_sentgroupmessage', send_message.group_id, send_message)
+        assign_perm('view_message', send_message.group_id, send_message.message_id)
         return send_message
 
 
@@ -111,13 +111,13 @@ class SendUserMessageSerializer(serializers.ModelSerializer):
         assign_perm('message.change_sentusermessage', user)
         assign_perm('message.delete_sentusermessage', user)
 
-        assign_perm('message.view_sentusermessage', send_message.user_id)
+        assign_perm('message.view_message', send_message.user_id)
         # object permission
         assign_perm('view_sentusermessage', user, send_message)
         assign_perm('change_sentusermessage', user, send_message)
         assign_perm('delete_sentusermessage', user, send_message)
 
-        assign_perm('view_sentusermessage', send_message.user_id, send_message)
+        assign_perm('view_message', send_message.user_id, send_message)
         return send_message
 
 
