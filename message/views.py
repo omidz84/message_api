@@ -25,7 +25,7 @@ class SendUserMessageView(generics.CreateAPIView):
 
 
 class SentMessagesView(generics.ListAPIView):
-    permission_classes = [CustomModelPermissions]
+    permission_classes = [permissions.IsAuthenticated]
     queryset = models.Message.objects.all()
     serializer_class = serializers.SentMessagesSerializer
 
@@ -56,7 +56,7 @@ class ReceivedMessagesView(generics.ListAPIView):
 
 
 class DetailMessageView(generics.RetrieveAPIView):
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [CustomObjectPermissions]
     queryset = models.Message.objects.all()
     serializer_class = serializers.DetailMessageSerializer
 
