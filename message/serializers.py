@@ -33,7 +33,6 @@ class MessageSerializer(serializers.ModelSerializer):
         user = message.creator
         # model permissions
         assign_perm('message.view_message', user)
-        assign_perm('message.add_message', user)
         assign_perm('message.change_message', user)
         assign_perm('message.delete_message', user)
         # object permission
@@ -68,7 +67,6 @@ class SendGroupMessageSerializer(serializers.ModelSerializer):
         user = send_message.sender
         # model permissions
         assign_perm('message.view_sentgroupmessage', user)
-        assign_perm('message.add_sentgroupmessage', user)
         assign_perm('message.change_sentgroupmessage', user)
         assign_perm('message.delete_sentgroupmessage', user)
 
@@ -107,7 +105,6 @@ class SendUserMessageSerializer(serializers.ModelSerializer):
         user = send_message.sender
         # model permissions
         assign_perm('message.view_sentusermessage', user)
-        assign_perm('message.add_sentusermessage', user)
         assign_perm('message.change_sentusermessage', user)
         assign_perm('message.delete_sentusermessage', user)
 
@@ -184,7 +181,6 @@ class ReplyMessageSerializer(serializers.ModelSerializer):
         user = message.creator
         # model permissions
         assign_perm('message.view_message', user)
-        assign_perm('message.add_message', user)
         assign_perm('message.change_message', user)
         assign_perm('message.delete_message', user)
         # object permission
