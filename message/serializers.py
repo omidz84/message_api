@@ -188,3 +188,17 @@ class ReplyMessageSerializer(serializers.ModelSerializer):
         assign_perm('change_message', user, message)
         assign_perm('delete_message', user, message)
         return message
+
+
+class DeleteMessageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.SeenMessage
+        fields = ['type']
+        extra_kwargs = {
+            'type': {'read_only': True}
+        }
+
+    def update(self, instance, validated_data):
+        instance.type = 'ownDelete'
+        instance.save()
+        return instance

@@ -83,3 +83,9 @@ class ShowReplyMessageView(generics.ListAPIView):
     def get_queryset(self):
         parent_id = self.kwargs['parent']
         return models.Message.objects.filter(parent__id=parent_id)
+
+
+class DeleteMessageView(generics.UpdateAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+    queryset = models.SeenMessage.objects.all()
+    serializer_class = serializers.DeleteMessageSerializer

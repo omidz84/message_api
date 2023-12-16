@@ -13,4 +13,5 @@ urlpatterns = [
     path('unread/count/', views.UnreadMessagesCountView.as_view()),
     path('reply/', views.ReplyMessageView.as_view(), name='reply-message'),
     path('reply/<int:parent>/', views.ShowReplyMessageView.as_view(), name='show-reply-message'),
+    path('delete/<int:pk>/', views.DeleteMessageView.as_view(), name='delete-message'),
 ]
