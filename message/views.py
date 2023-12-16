@@ -25,7 +25,7 @@ class SendUserMessageView(generics.CreateAPIView):
 
 
 class SentMessagesView(generics.ListAPIView):
-    permission_classes = [CustomModelPermissions]
+    permission_classes = [permissions.IsAuthenticated]
     queryset = models.Message.objects.all()
     serializer_class = serializers.SentMessagesSerializer
 
@@ -34,18 +34,6 @@ class SentMessagesView(generics.ListAPIView):
         if user.is_superuser:
             return models.Message.objects.all()
         return models.Message.objects.filter(creator=user)
-
-
-class ReplyMessageView(generics.CreateAPIView):
-    permission_classes = [permissions.IsAuthenticated]
-    queryset = models.ReplyMessage.objects.all()
-    serializer_class = serializers.ReplyMessageSerializer
-
-
-class DetailReplyMessageView(generics.RetrieveAPIView):
-    permission_classes = [CustomObjectPermissions]
-    queryset = models.ReplyMessage.objects.all()
-    serializer_class = serializers.DetailReplyMessageSerializer
 
 
 class ReceivedMessagesView(generics.ListAPIView):
@@ -67,13 +55,7 @@ class ReceivedMessagesView(generics.ListAPIView):
         return models.Message.objects.filter(id__in=message)
 
 
-class DetailMessageView(generics.RetrieveAPIView):
-    permission_classes = [permissions.IsAuthenticated]
-    queryset = models.Message.objects.all()
-    serializer_class = serializers.DetailMessageSerializer
-
-
-class UpdateMessageView(generics.RetrieveUpdateDestroyAPIView):
+class DetailMessageView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [CustomObjectPermissions]
     queryset = models.Message.objects.all()
     serializer_class = serializers.DetailMessageSerializer
@@ -87,3 +69,23 @@ class UnreadMessagesCountView(generics.GenericAPIView):
         serializer = self.serializer_class(request.data, context={'request': request})
         return Response(serializer.data)
 
+
+class ReplyMessageView(generics.CreateAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+    queryset = models.Message.objects.all()
+    serializer_class = serializers.ReplyMessageSerializer
+
+
+class ShowReplyMessageView(generics.ListAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = serializers.MessageSerializer
+
+    def get_queryset(self):
+        parent_id = self.kwargs['parent']
+        return models.Message.objects.filter(parent__id=parent_id)
+
+
+class DeleteMessageView(generics.UpdateAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+    queryset = models.SeenMessage.objects.all()
+    serializer_class = serializers.DeleteMessageSerializer

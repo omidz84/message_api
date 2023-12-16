@@ -19,6 +19,7 @@ class MessageSerializer(serializers.ModelSerializer):
         fields = '__all__'
         extra_kwargs = {
             'creator': {'read_only': True},
+            'parent': {'read_only': True}
         }
 
     def create(self, validated_data):
@@ -32,12 +33,10 @@ class MessageSerializer(serializers.ModelSerializer):
         user = message.creator
         # model permissions
         assign_perm('message.view_message', user)
-        assign_perm('message.add_message', user)
         assign_perm('message.change_message', user)
         assign_perm('message.delete_message', user)
         # object permission
         assign_perm('view_message', user, message)
-        assign_perm('add_message', user, message)
         assign_perm('change_message', user, message)
         assign_perm('delete_message', user, message)
         return message
@@ -68,18 +67,16 @@ class SendGroupMessageSerializer(serializers.ModelSerializer):
         user = send_message.sender
         # model permissions
         assign_perm('message.view_sentgroupmessage', user)
-        assign_perm('message.add_sentgroupmessage', user)
         assign_perm('message.change_sentgroupmessage', user)
         assign_perm('message.delete_sentgroupmessage', user)
 
-        assign_perm('message.view_sentgroupmessage', send_message.group_id)
+        assign_perm('message.view_message', send_message.group_id)
         # object permission
         assign_perm('view_sentgroupmessage', user, send_message)
-        assign_perm('add_sentgroupmessage', user, send_message)
         assign_perm('change_sentgroupmessage', user, send_message)
         assign_perm('delete_sentgroupmessage', user, send_message)
 
-        assign_perm('view_sentgroupmessage', send_message.group_id, send_message)
+        assign_perm('view_message', send_message.group_id, send_message.message_id)
         return send_message
 
 
@@ -108,18 +105,16 @@ class SendUserMessageSerializer(serializers.ModelSerializer):
         user = send_message.sender
         # model permissions
         assign_perm('message.view_sentusermessage', user)
-        assign_perm('message.add_sentusermessage', user)
         assign_perm('message.change_sentusermessage', user)
         assign_perm('message.delete_sentusermessage', user)
 
-        assign_perm('message.view_sentusermessage', send_message.user_id)
+        assign_perm('message.view_message', send_message.user_id)
         # object permission
         assign_perm('view_sentusermessage', user, send_message)
-        assign_perm('add_sentusermessage', user, send_message)
         assign_perm('change_sentusermessage', user, send_message)
         assign_perm('delete_sentusermessage', user, send_message)
 
-        assign_perm('view_sentusermessage', send_message.user_id, send_message)
+        assign_perm('view_message', send_message.user_id, send_message)
         return send_message
 
 
@@ -128,57 +123,6 @@ class SentMessagesSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Message
         fields = '__all__'
-
-
-class ReplyMessageSerializer(serializers.ModelSerializer):
-    sender = UserSerializer(read_only=True)
-
-    class Meta:
-        model = models.ReplyMessage
-        fields = '__all__'
-        extra_kwargs = {
-            'sender': {'read_only': True},
-        }
-
-    def create(self, validated_data):
-        request = self.context.get('request')
-        reply = models.ReplyMessage.objects.create(
-            message_id=validated_data['message_id'],
-            title=validated_data['title'],
-            message_body=validated_data['message_body'],
-            sender=request.user,
-        )
-
-        user = reply.sender
-
-        # model permissions
-        assign_perm('message.view_replymessage', user)
-        assign_perm('message.add_replymessage', user)
-        assign_perm('message.change_replymessage', user)
-        assign_perm('message.delete_replymessage', user)
-
-        assign_perm('message.view_replymessage', reply.message_id.creator)
-        # object permission
-        assign_perm('view_replymessage', user, reply)
-        assign_perm('add_replymessage', user, reply)
-        assign_perm('change_replymessage', user, reply)
-        assign_perm('delete_replymessage', user, reply)
-
-        assign_perm('view_replymessage', reply.message_id.creator, reply)
-
-        return reply
-
-
-class DetailReplyMessageSerializer(serializers.ModelSerializer):
-    sender = UserSerializer(read_only=True)
-    message_id = MessageSerializer(read_only=True)
-
-    class Meta:
-        model = models.ReplyMessage
-        fields = '__all__'
-        extra_kwargs = {
-            'sender': {'read_only': True},
-        }
 
 
 class DetailMessageSerializer(serializers.ModelSerializer):
@@ -214,3 +158,47 @@ class UnreadMessagesSerializer(serializers.Serializer):
         seen_message = models.SeenMessage.objects.filter(user_id=user).count()
         unread_message = message - seen_message
         return unread_message
+
+
+class ReplyMessageSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = models.Message
+        fields = '__all__'
+        extra_kwargs = {
+            'creator': {'read_only': True}
+        }
+
+    def create(self, validated_data):
+        request = self.context.get('request')
+        message = models.Message.objects.create(
+            title=validated_data['title'],
+            message_body=validated_data['message_body'],
+            creator=request.user,
+            send_type=validated_data['send_type'],
+            parent=validated_data['parent']
+        )
+        user = message.creator
+        # model permissions
+        assign_perm('message.view_message', user)
+        assign_perm('message.change_message', user)
+        assign_perm('message.delete_message', user)
+        # object permission
+        assign_perm('view_message', user, message)
+        assign_perm('change_message', user, message)
+        assign_perm('delete_message', user, message)
+        return message
+
+
+class DeleteMessageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.SeenMessage
+        fields = ['type']
+        extra_kwargs = {
+            'type': {'read_only': True}
+        }
+
+    def update(self, instance, validated_data):
+        instance.type = 'ownDelete'
+        instance.save()
+        return instance

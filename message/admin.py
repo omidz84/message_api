@@ -24,7 +24,3 @@ class SentUserMessageAdmin(admin.ModelAdmin):
 class SeenMessageAdmin(admin.ModelAdmin):
     list_display = ['message_id', 'user_id', 'type', 'created_at']
 
-
-@admin.register(models.ReplyMessage)
-class ReplyMessageAdmin(admin.ModelAdmin):
-    list_display = ['message_id', 'title', 'sender', 'updated_at']
