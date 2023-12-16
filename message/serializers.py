@@ -75,7 +75,7 @@ class SendGroupMessageSerializer(serializers.ModelSerializer):
         assign_perm('message.change_sentgroupmessage', user, send_message)
         assign_perm('message.delete_sentgroupmessage', user, send_message)
 
-        assign_perm('view_message', send_message.group_id, send_message.message_id)
+        assign_perm('message.view_message', send_message.group_id, send_message.message_id)
         return send_message
 
 
