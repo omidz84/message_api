@@ -86,6 +86,6 @@ class ShowReplyMessageView(generics.ListAPIView):
 
 
 class DeleteMessageView(generics.UpdateAPIView):
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [CustomObjectPermissions]
     queryset = models.SeenMessage.objects.all()
     serializer_class = serializers.DeleteMessageSerializer
