@@ -13,7 +13,6 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class MessageSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = models.Message
         fields = '__all__'
@@ -116,13 +115,6 @@ class SendUserMessageSerializer(serializers.ModelSerializer):
 
         assign_perm('message.view_message', send_message.user_id, send_message.message_id)
         return send_message
-
-
-class SentMessagesSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = models.Message
-        fields = '__all__'
 
 
 class DetailMessageSerializer(serializers.ModelSerializer):
