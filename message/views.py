@@ -27,7 +27,7 @@ class SendUserMessageView(generics.CreateAPIView):
 class SentMessagesView(generics.ListAPIView):
     permission_classes = [permissions.IsAuthenticated]
     queryset = models.Message.objects.all()
-    serializer_class = serializers.SentMessagesSerializer
+    serializer_class = serializers.MessageSerializer
 
     def get_queryset(self):
         user = self.request.user
