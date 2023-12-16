@@ -36,9 +36,9 @@ class MessageSerializer(serializers.ModelSerializer):
         assign_perm('message.change_message', user)
         assign_perm('message.delete_message', user)
         # object permission
-        assign_perm('view_message', user, message)
-        assign_perm('change_message', user, message)
-        assign_perm('delete_message', user, message)
+        assign_perm('message.view_message', user, message)
+        assign_perm('message.change_message', user, message)
+        assign_perm('message.delete_message', user, message)
         return message
 
 
@@ -72,9 +72,9 @@ class SendGroupMessageSerializer(serializers.ModelSerializer):
 
         assign_perm('message.view_message', send_message.group_id)
         # object permission
-        assign_perm('view_sentgroupmessage', user, send_message)
-        assign_perm('change_sentgroupmessage', user, send_message)
-        assign_perm('delete_sentgroupmessage', user, send_message)
+        assign_perm('message.view_sentgroupmessage', user, send_message)
+        assign_perm('message.change_sentgroupmessage', user, send_message)
+        assign_perm('message.delete_sentgroupmessage', user, send_message)
 
         assign_perm('view_message', send_message.group_id, send_message.message_id)
         return send_message
@@ -110,11 +110,11 @@ class SendUserMessageSerializer(serializers.ModelSerializer):
 
         assign_perm('message.view_message', send_message.user_id)
         # object permission
-        assign_perm('view_sentusermessage', user, send_message)
-        assign_perm('change_sentusermessage', user, send_message)
-        assign_perm('delete_sentusermessage', user, send_message)
+        assign_perm('message.view_sentusermessage', user, send_message)
+        assign_perm('message.change_sentusermessage', user, send_message)
+        assign_perm('message.delete_sentusermessage', user, send_message)
 
-        assign_perm('view_message', send_message.user_id, send_message)
+        assign_perm('message.view_message', send_message.user_id, send_message.message_id)
         return send_message
 
 
@@ -134,11 +134,20 @@ class DetailMessageSerializer(serializers.ModelSerializer):
         fields = ['id', 'title', 'message_body', 'creator', 'send_type', 'is_draft', 'updated_at', 'seen_status']
 
     def get_seen_status(self, obj):
-        request = self.context['request']
+        user = self.context['request'].user
         try:
-            models.SeenMessage.objects.get(message_id=obj, user_id=request.user, type='seen')
+            models.SeenMessage.objects.get(message_id=obj, user_id=user, type='seen')
         except models.SeenMessage.DoesNotExist:
-            models.SeenMessage.objects.create(message_id=obj, user_id=request.user, type='seen')
+            message = models.SeenMessage.objects.create(message_id=obj, user_id=user, type='seen')
+
+            # model permissions
+            assign_perm('message.view_seenmessage', user)
+            assign_perm('message.change_seenmessage', user)
+            assign_perm('message.delete_seenmessage', user)
+            # object permission
+            assign_perm('message.view_seenmessage', user, message)
+            assign_perm('message.change_seenmessage', user, message)
+            assign_perm('message.delete_seenmessage', user, message)
 
 
 class UnreadMessagesSerializer(serializers.Serializer):
@@ -184,9 +193,9 @@ class ReplyMessageSerializer(serializers.ModelSerializer):
         assign_perm('message.change_message', user)
         assign_perm('message.delete_message', user)
         # object permission
-        assign_perm('view_message', user, message)
-        assign_perm('change_message', user, message)
-        assign_perm('delete_message', user, message)
+        assign_perm('message.view_message', user, message)
+        assign_perm('message.change_message', user, message)
+        assign_perm('message.delete_message', user, message)
         return message
 
 
