@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from guardian.shortcuts import assign_perm
 from rest_framework import serializers
 
-from . import models
+from message import models
 
 
 class UserSerializer(serializers.ModelSerializer):
