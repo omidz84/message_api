@@ -2,8 +2,9 @@ from rest_framework import generics
 from rest_framework import permissions
 from rest_framework.response import Response
 
-from . import serializers, models
-from .permissions import CustomObjectPermissions, CustomModelPermissions
+from message import models
+from message.permissions import CustomObjectPermissions
+from message.apis import serializers
 
 
 class CreateMessageView(generics.CreateAPIView):

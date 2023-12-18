@@ -1,8 +1,8 @@
 from django.urls import path
 
-from . import views
+from message.apis import views
 
-app_nam = 'message'
+app_name = 'message'
 urlpatterns = [
     path('new/', views.CreateMessageView.as_view(), name='new-message'),
     path('send/group/', views.SendGroupMessageView.as_view(), name='send-group-message'),
